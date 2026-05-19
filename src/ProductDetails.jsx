@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function ProductDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [activeImg, setActiveImg] = useState("");
   const [loading, setLoading] = useState(true);
@@ -61,6 +62,7 @@ function ProductDetails() {
             <p>{product.description}</p>
           </div>
         </div>
+        <button onClick={()=>navigate(-1)}>Back</button>
       </div>
     </div>
   );

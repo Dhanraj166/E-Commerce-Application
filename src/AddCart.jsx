@@ -48,7 +48,7 @@ function AddCart() {
             <button onClick={() => decreaseQty(index)}>-</button>
             <span>{item.quantity}</span>
             <button onClick={() => increaseQty(index)}>+</button>
-            <button onClick={removeItem(index)}>Remove</button>
+            <button onClick={() => removeItem(index)}>Remove</button>
           </div>
         ))
       )}
@@ -56,4 +56,4 @@ function AddCart() {
   );
 }
 
-export default AddCart;
+export default AddCart;   

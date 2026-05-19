@@ -10,6 +10,8 @@ function Product() {
   const { addProduct, setAddProduct } = useContext(NameContext);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  console.log(addProduct);
+  
 
   useEffect(() => {
     axios("https://dummyjson.com/products?limit=100")
