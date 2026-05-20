@@ -7,18 +7,20 @@ import cartIcon from './assets/addCart.png';
 function Product() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
-  const { addProduct, setAddProduct } = useContext(NameContext);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(true);
+  
+  const { addProduct, setAddProduct } = useContext(NameContext);
   const navigate = useNavigate();
   console.log(addProduct);
-  
+
 
   useEffect(() => {
     axios("https://dummyjson.com/products?limit=100")
       .then(res => {
         setProducts(res.data.products);
         console.log(res.data.products);
-        
+
         setLoading(false);
       })
       .catch(err => {
@@ -27,9 +29,15 @@ function Product() {
       });
   }, []);
 
-  const filteredProducts = products.filter(product =>
-    product.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProducts = products
+    .filter(product =>
+      product.title.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter(product =>
+      selectedCategory === "all" || selectedCategory === product.category
+    );
+
+  const categories = ["all",...new Set(products.map(p => p.category))]
 
   function handleAddcart(product) {
     setAddProduct(prev => {
@@ -58,6 +66,17 @@ function Product() {
         placeholder="Search a product here..."
         onChange={(e) => setSearch(e.target.value)}
       />
+
+      <select
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)
+        }>
+          {
+            categories.map((category) => (
+              <option key={category} value={category}>{category.toUpperCase()}</option>
+            ))
+          }
+      </select>
 
       <div className="addCart-logo" onClick={() => navigate('/cartpage')}>
         <img src={cartIcon} alt="cart" width="80" />

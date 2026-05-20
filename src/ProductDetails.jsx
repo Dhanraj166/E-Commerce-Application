@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { NameContext } from "./App";
+
 
 function ProductDetails() {
   const { id } = useParams();
@@ -9,6 +11,7 @@ function ProductDetails() {
   const [activeImg, setActiveImg] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { setAddProduct } = useContext(NameContext);
 
   useEffect(() => {
     setLoading(true);
@@ -24,6 +27,20 @@ function ProductDetails() {
         setLoading(false);
       });
   }, [id]);
+
+  function handleAddcart(product) {
+    setAddProduct(prev => {
+      const existing = prev.find(item => item.id === product.id);
+      if (existing) {
+        return prev.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+  }
 
   if (loading) return <h2>Loading...</h2>;
   if (error) return <h2>{error}</h2>;
@@ -57,12 +74,14 @@ function ProductDetails() {
           <p className="rating">⭐ {product.rating}</p>
           <p>Stock: {product.stock}</p>
 
+          <button onClick={handleAddcart(product)}>Add to cart</button>
+
           <div className="section">
             <h3>Description</h3>
             <p>{product.description}</p>
           </div>
         </div>
-        <button onClick={()=>navigate(-1)}>Back</button>
+        <button onClick={() => navigate(-1)}>Back</button>
       </div>
     </div>
   );
