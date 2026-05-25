@@ -3,24 +3,23 @@ import axios from "axios";
 import { NameContext } from './App';
 import { useNavigate } from 'react-router-dom';
 import cartIcon from './assets/addCart.png';
+import './styles/index.css';
+import './styles/Product.css';
 
 function Product() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(true);
-  
   const { addProduct, setAddProduct } = useContext(NameContext);
   const navigate = useNavigate();
   console.log(addProduct);
-
 
   useEffect(() => {
     axios("https://dummyjson.com/products?limit=100")
       .then(res => {
         setProducts(res.data.products);
         console.log(res.data.products);
-
         setLoading(false);
       })
       .catch(err => {
@@ -37,7 +36,7 @@ function Product() {
       selectedCategory === "all" || selectedCategory === product.category
     );
 
-  const categories = ["all",...new Set(products.map(p => p.category))]
+  const categories = ["all", ...new Set(products.map(p => p.category))];
 
   function handleAddcart(product) {
     setAddProduct(prev => {
@@ -57,57 +56,89 @@ function Product() {
     navigate(`/product/${product.id}`);
   }
 
-  if (loading) return <h1>Loading...</h1>;
+  if (loading) return <div className="product-loading">Loading products…</div>;
 
   return (
-    <>
-      <input
-        type="text"
-        placeholder="Search a product here..."
-        onChange={(e) => setSearch(e.target.value)}
-      />
+    <div className="product-page">
 
-      <select
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)
-        }>
-          {
-            categories.map((category) => (
-              <option key={category} value={category}>{category.toUpperCase()}</option>
-            ))
-          }
-      </select>
+      {/* ── Top Bar ── */}
+      <div className="product-topbar">
+        <div className="product-topbar-inner">
+          <span className="product-topbar-logo">ShopNow</span>
 
-      <div className="addCart-logo" onClick={() => navigate('/cartpage')}>
-        <img src={cartIcon} alt="cart" width="80" />
-        <span>{addProduct.length}</span>
+          <div className="product-search-wrap">
+            {/* <span className="product-search-icon">🔍</span> */}
+            <input
+              type="text"
+              placeholder="Search a product here..."
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          <select
+            className="product-category-select"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category.toUpperCase()}
+              </option>
+            ))}
+          </select>
+
+          <div className="cart-btn" onClick={() => navigate('/cartpage')}>
+            <img src={cartIcon} alt="cart" />
+            <span className="cart-btn-count">{addProduct.length}</span>
+          </div>
+        </div>
       </div>
 
-      {filteredProducts.length === 0 ? (
-        <h1>Product not found</h1>
-      ) : (
-        filteredProducts.map(product => (
-          <div key={product.id}>
-            <p>{product.category}</p>
-
-            <img
-              src={product.thumbnail}
-              width="100"
-              onClick={() => viewProduct(product)}
-              style={{ cursor: "pointer" }}
-            />
-
-            <h5>{product.title}</h5>
-            <p>Price: ${product.price}</p>
-            <h6>Rating: {product.rating}</h6>
-
-            <button onClick={() => handleAddcart(product)}>
-              Add to Cart
-            </button>
+      {/* ── Main ── */}
+      <div className="product-main-content">
+        {filteredProducts.length === 0 ? (
+          <div className="product-empty">
+            <p>No products found for "<strong>{search}</strong>"</p>
           </div>
-        ))
-      )}
-    </>
+        ) : (
+          <>
+            <p className="product-results-label">
+              {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+            </p>
+            <div className="product-grid">
+              {filteredProducts.map(product => (
+                <div key={product.id} className="product-card">
+                  <div
+                    className="product-card-image-wrap"
+                    onClick={() => viewProduct(product)}
+                  >
+                    <span className="product-card-category-badge">
+                      {product.category}
+                    </span>
+                    <img src={product.thumbnail} alt={product.title} />
+                  </div>
+
+                  <div className="product-card-body">
+                    <h5 className="product-card-title">{product.title}</h5>
+                    <p className="product-card-rating">⭐ {product.rating}</p>
+                    <p className="product-card-price">${product.price}</p>
+                  </div>
+
+                  <div className="product-card-footer">
+                    <button
+                      className="product-card-add-btn"
+                      onClick={() => handleAddcart(product)}
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 

@@ -2,7 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { NameContext } from "./App";
-
+import './styles/index.css';
+import './styles/ProductDetails.css';
 
 function ProductDetails() {
   const { id } = useParams();
@@ -42,25 +43,39 @@ function ProductDetails() {
     });
   }
 
-  if (loading) return <h2>Loading...</h2>;
-  if (error) return <h2>{error}</h2>;
+  if (loading) return <div className="pd-loading">Loading product...</div>;
+  if (error) return <div className="pd-error">{error}</div>;
 
   return (
-    <div className="product-container">
-      <div className="product-header">
-        <h2>{product.title}</h2>
-        <p><b>Brand:</b> {product.brand}</p>
-        <p><b>Category:</b> {product.category}</p>
+    <div className="pd-page">
+
+      {/* Header */}
+      <div className="pd-header">
+        <div className="pd-header-inner">
+          <button className="pd-back-btn" onClick={() => navigate(-1)}>
+            Back
+          </button>
+          <span className="pd-breadcrumb">
+            {product.category} / <span>{product.title}</span>
+          </span>
+        </div>
       </div>
 
-      <div className="product-main">
-        {/* Images */}
-        <div className="product-image">
-          <img src={activeImg} alt={product.title} />
+      {/* Content */}
+      <div className="pd-container">
 
-          <div className="thumbnail-list">
+        {/* Images */}
+        <div className="pd-image-panel">
+          <div className="pd-main-image">
+            <img src={activeImg} alt={product.title} />
+          </div>
+          <div className="pd-thumbnails">
             {product.images.map((img, index) => (
-              <button key={index} onClick={() => setActiveImg(img)}>
+              <button
+                key={index}
+                className={`pd-thumb-btn ${activeImg === img ? 'active' : ''}`}
+                onClick={() => setActiveImg(img)}
+              >
                 <img src={img} alt={`${product.title}-${index}`} />
               </button>
             ))}
@@ -68,20 +83,43 @@ function ProductDetails() {
         </div>
 
         {/* Info */}
-        <div className="product-info">
-          <p className="price">${product.price}</p>
-          <p>Discount: {product.discountPercentage}%</p>
-          <p className="rating">⭐ {product.rating}</p>
-          <p>Stock: {product.stock}</p>
-
-          <button onClick={handleAddcart(product)}>Add to cart</button>
-
-          <div className="section">
-            <h3>Description</h3>
-            <p>{product.description}</p>
+        <div className="pd-info-panel">
+          <div>
+            <span className="pd-category-badge">{product.category}</span>
+            <p className="pd-brand">{product.brand}</p>
+            <h2 className="pd-title">{product.title}</h2>
           </div>
+
+          <div className="pd-meta-row">
+            <span className="pd-rating">Rating: {product.rating}</span>
+            <span className={`pd-stock-badge ${product.availabilityStatus?.toLowerCase() === 'in stock' ? 'in-stock' : 'out-of-stock'}`}>
+              {product.availabilityStatus}
+            </span>
+          </div>
+
+          <div className="pd-price-block">
+            <span className="pd-price">${product.price}</span>
+            <span className="pd-discount-badge">{product.discountPercentage}% OFF</span>
+          </div>
+
+          <hr className="pd-divider" />
+
+          <div>
+            <p className="pd-section-label">Description</p>
+            <p className="pd-description">{product.description}</p>
+          </div>
+
+          <p className="pd-stock-info">
+            Stock: <strong>{product.stock} units</strong> available
+          </p>
+
+          <button
+            className="pd-add-cart-btn"
+            onClick={() => handleAddcart(product)}
+          >
+            Add to Cart
+          </button>
         </div>
-        <button onClick={() => navigate(-1)}>Back</button>
       </div>
     </div>
   );
