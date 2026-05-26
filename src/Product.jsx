@@ -30,7 +30,7 @@ function Product() {
 
   const filteredProducts = products
     .filter(product =>
-      product.title.toLowerCase().includes(search.toLowerCase())
+      product.title.toLowerCase().includes(search.toLowerCase().trim())
     )
     .filter(product =>
       selectedCategory === "all" || selectedCategory === product.category
@@ -99,7 +99,7 @@ function Product() {
         {filteredProducts.length === 0 ? (
           <div className="product-empty">
             <p>No products found for "<strong>{search}</strong>"</p>
-          </div>
+          </div>        
         ) : (
           <>
             <p className="product-results-label">
